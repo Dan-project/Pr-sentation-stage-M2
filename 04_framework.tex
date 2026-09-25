@@ -141,6 +141,8 @@
 %    l'image + points LiDAR projetés (couleur selon la distance) +
 %    légende des classes. Il ne sert pas au calcul de la carte, mais
 %    permet de vérifier en direct la calibration et l'association.
+%  - Deux LiDAR différents : Velodyne 64 nappes (KITTI, à droite) et
+%    Ouster 32 nappes (Scout, à gauche) -> nuage bien plus dense sur KITTI.
 % ----------------------------------------------------------------------
 \begin{frame}{Association sémantique}
   \centering
@@ -148,34 +150,13 @@
    \quad$\Rightarrow$\quad point = \alert{position 3D} (LiDAR) + \alert{label} (caméra)\par}
   \vspace{0.3cm}
   \begin{tabular}{@{}c@{\hspace{0.35cm}}c@{}}
-    \includegraphics[height=3.9cm]{points.png} &
-    \includegraphics[height=3.9cm]{opencv_ranger.png} \\[1pt]
+    \includegraphics[height=2.85cm]{points.png} &
+    \includegraphics[height=2.85cm]{opencv_kitti.png} \\[1pt]
     \legende{Scout Mini -- parking du bâtiment ESPRIT} &
-    \legende{Ranger} \\
+    \legende{KITTI} \\
   \end{tabular}\par
   \vspace{0.2cm}
   {\small Affichage \alert{OpenCV} temps réel : contrôle visuel de la \alert{calibration}\par}
-\end{frame}
-
-% ----------------------------------------------------------------------
-% À DIRE (~20 s)
-%  - Vidéo de 10 s sur le bag KITTI : l'affichage OpenCV du framework en
-%    temps réel. Masque sémantique YOLO superposé à l'image + points LiDAR
-%    projetés (couleur selon la distance), légende des classes à droite.
-%  - Montrer que les points tombent bien sur les objets (voitures, route,
-%    végétation) -> calibration LiDAR-caméra correcte, association cohérente.
-%  - Cliquer sur l'image pour lancer la vidéo (pdfpc ou Adobe Reader ;
-%    Aperçu sur Mac ne lit pas les vidéos). La vidéo est dans videos/.
-% ----------------------------------------------------------------------
-\begin{frame}{Fusion en temps réel (KITTI)}
-  \centering
-  \movie[width=\textwidth, height=0.3016\textwidth, poster, showcontrols, loop]%
-    {\includegraphics[width=\textwidth]{videos/opencv_kitti_poster.png}}%
-    {videos/opencv_kitti.mp4}\par
-  \vspace{0.2cm}
-  \legende{Affichage OpenCV : masque YOLO + points LiDAR projetés \quad\textbullet\quad cliquer pour lancer la vidéo (10 s)}
-  \vspace{0.3cm}
-  {\small points LiDAR bien placés sur les objets $\Rightarrow$ \alert{calibration} et \alert{association} correctes\par}
 \end{frame}
 
 % ----------------------------------------------------------------------
@@ -319,4 +300,104 @@
       \end{itemize}
     \end{column}
   \end{columns}
+\end{frame}
+
+
+% ----------------------------------------------------------------------
+% À DIRE (~40 s)
+%  - Première validation sur KITTI (séquences "city" des données brutes) :
+%    LiDAR Velodyne 64 nappes, caméra couleur 1242 x 375, IMU 6 axes, GPS.
+%  - Conversion : le "kitti publisher node" posait des problèmes
+%    d'horodatage et de type sur le GPS -> j'ai porté kitti2bag (ROS 1)
+%    vers ROS 2 : conversion faite une seule fois, bag portable.
+%  - Trois points de vigilance pour LIO :
+%      * les matrices de calibration LiDAR <-> IMU (LIO couple fortement
+%        les deux capteurs) ;
+%      * le champ ring (numéro de nappe de chaque point) est
+%        INDISPENSABLE à LIO et absent de KITTI -> recalculé à partir de
+%        l'angle d'élévation : theta = arcsin(z / D), puis ramené entre
+%        theta_min = -24,8° et theta_max = 2° sur N = 64 nappes
+%        (approximation : espacement angulaire uniforme) ;
+%      * le champ time (instant de chaque point dans le scan, utilisé pour
+%        le deskewing) est absent aussi : pas indispensable, non
+%        reconstruit -> piste d'amélioration.
+%  - Résultat : LIO fonctionne sur le bag (~60 s, zone urbaine, > 50 km/h
+%    sur la grande ligne droite, bien plus vite que nos robots).
+%  - Transition : la vidéo suivante montre le framework complet en marche.
+% ----------------------------------------------------------------------
+\begin{frame}{Validation sur KITTI : mise en place}
+  \begin{columns}[c]
+    \begin{column}{0.46\textwidth}
+      \begin{itemize}
+        \item KITTI « city » : Velodyne 64 nappes, caméra, IMU 6 axes, GPS
+        \item \texttt{kitti2bag} porté en \alert{ROS 2}
+        \item Points de vigilance pour LIO :
+        \begin{itemize}
+          \item calibration \alert{LiDAR -- IMU}
+          \item champ \texttt{ring} \alert{recalculé}\\
+                {\footnotesize\color{textgray} à partir de l'angle d'élévation}
+          \item champ \texttt{time} absent\\
+                {\footnotesize\color{textgray} pas de deskew (piste d'amélioration)}
+        \end{itemize}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.52\textwidth}
+      \centering
+      \adjincludegraphics[width=\linewidth, trim={{0.02\width} {0.1\height} {0.1\width} {0.08\height}}, clip]{kitti_liosam.png}\\
+      \legende{Carte LIO sur le bag KITTI ($\sim$60 s, $>$ 50 km/h)}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ----------------------------------------------------------------------
+% À DIRE (~20 s)
+%  - Vidéo de 10 s sur le bag KITTI : l'affichage OpenCV du framework en
+%    temps réel. Masque sémantique YOLO superposé à l'image + points LiDAR
+%    projetés (couleur selon la distance), légende des classes à droite.
+%  - Montrer que les points tombent bien sur les objets (voitures, route,
+%    végétation) -> calibration LiDAR-caméra correcte, association cohérente.
+%  - YOLO est bien entraîné pour ce type de scène urbaine (Cityscapes).
+%  - Cliquer sur l'image pour lancer la vidéo (pdfpc ou Adobe Reader ;
+%    Aperçu sur Mac ne lit pas les vidéos). La vidéo est dans videos/.
+% ----------------------------------------------------------------------
+\begin{frame}{Validation sur KITTI : fusion en temps réel}
+  \centering
+  \movie[width=\textwidth, height=0.3016\textwidth, poster, showcontrols, loop]%
+    {\includegraphics[width=\textwidth]{videos/opencv_kitti_poster.png}}%
+    {videos/opencv_kitti.mp4}\par
+  \vspace{0.2cm}
+  \legende{Affichage OpenCV : masque YOLO + points LiDAR projetés \quad\textbullet\quad cliquer pour lancer la vidéo (10 s)}
+  \vspace{0.3cm}
+  {\small points LiDAR bien placés sur les objets $\Rightarrow$ \alert{calibration} et \alert{association} correctes\par}
+\end{frame}
+
+% ----------------------------------------------------------------------
+% À DIRE (~40 s)
+%  - Cartes = représentation du GeoJSON produit par le framework.
+%    Couleurs : bâtiments en rouge, végétation en vert, route en noir, eau
+%    en bleu, gris = sol hors route + autres labels.
+%  - Carte 2D avec un pas de 1 m puis de 0,5 m (en réalité la carte est
+%    3D ; ici toutes les valeurs sont aplaties en 2D).
+%  - Carte 3D : on remarque une légère courbure... qu'on retrouve aussi
+%    dans la carte native de LIO -> elle vient de LIO, pas du framework.
+%  - Le framework complet fonctionne sur KITTI ; YOLO est bien entraîné
+%    pour ce type de scène urbaine (Cityscapes) ; la version nano a été
+%    quasiment imposée par la puissance limitée du PC.
+% ----------------------------------------------------------------------
+\begin{frame}{Validation sur KITTI : cartes sémantiques}
+  \centering
+  \begin{tabular}{@{}c@{\hspace{0.3cm}}c@{}}
+    \adjincludegraphics[width=0.47\textwidth, trim={{0.01\width} {0.06\height} {0.03\width} {0.03\height}}, clip]{2d_kitti.png} &
+    \adjincludegraphics[width=0.47\textwidth, trim={{0.0\width} {0.04\height} {0.0\width} {0.03\height}}, clip]{01_kitti.png} \\
+    \legende{Carte 2D -- pas de 1 m} & \legende{Carte 2D -- pas de 0,5 m} \\[4pt]
+    \adjincludegraphics[width=0.47\textwidth, trim={{0.08\width} {0.15\height} {0.09\width} {0.22\height}}, clip]{3D-kitti.png} &
+    \adjincludegraphics[width=0.47\textwidth, trim={{0.04\width} {0.28\height} {0.09\width} {0.38\height}}, clip]{pente_kitti.png} \\
+    \legende{Carte 3D générée} & \legende{Carte native de LIO : même légère courbure} \\
+  \end{tabular}\par
+  \vspace{0.15cm}
+  {\footnotesize
+   \textcolor{cBati}{\rule{0.7em}{0.7em}} bâtiment \quad
+   \textcolor{cVege}{\rule{0.7em}{0.7em}} végétation \quad
+   \textcolor{cRoute}{\rule{0.7em}{0.7em}} route \quad
+   \textcolor{cAutre}{\rule{0.7em}{0.7em}} sol et autres\par}
 \end{frame}

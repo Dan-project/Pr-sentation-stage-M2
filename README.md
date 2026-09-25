@@ -24,9 +24,9 @@ Fira Sans est utilisée si elle est installée, sinon Latin Modern.
 | `01_contexte.tex` | contexte, problématique, objectifs |
 | `02_liosam.tex` | SLAM et graphe de facteurs, LIO-SAM (principe, architecture, choix de LIORF) |
 | `03_yolo.tex` | YOLO : principe, pourquoi la segmentation sémantique |
-| `04_framework.tex` | architecture, projection, association, repère monde, carte |
+| `04_framework.tex` | architecture, projection, association, repère monde, carte, validation KITTI (avec la vidéo) |
 | `05_extensions.tex` | loop closure, carte a priori, multi-robots |
-| `06_resultats.tex` | plateformes, KITTI, Ranger, Scout, multi-robots |
+| `06_resultats.tex` | plateformes, Ranger, Scout, multi-robots |
 | `07_conclusion.tex` | bilan, perspectives, questions |
 | `08_annexes.tex` | slides de secours pour les questions |
 
@@ -43,7 +43,7 @@ Fira Sans est utilisée si elle est installée, sinon Latin Modern.
 
 ## Vidéo
 
-La slide « Fusion en temps réel (KITTI) » contient `videos/opencv_kitti.mp4`,
+La slide « Validation sur KITTI : fusion en temps réel » contient `videos/opencv_kitti.mp4`,
 un extrait de 10 s recadré sur la fenêtre OpenCV. Garde le dossier `videos/`
 à côté du PDF et clique sur l'image pour lancer la vidéo. Elle se lit avec
 pdfpc (`brew install pdfpc`), Adobe Reader ou Okular, mais pas avec Aperçu
