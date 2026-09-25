@@ -158,6 +158,27 @@
 \end{frame}
 
 % ----------------------------------------------------------------------
+% À DIRE (~20 s)
+%  - Vidéo de 10 s sur le bag KITTI : l'affichage OpenCV du framework en
+%    temps réel. Masque sémantique YOLO superposé à l'image + points LiDAR
+%    projetés (couleur selon la distance), légende des classes à droite.
+%  - Montrer que les points tombent bien sur les objets (voitures, route,
+%    végétation) -> calibration LiDAR-caméra correcte, association cohérente.
+%  - Cliquer sur l'image pour lancer la vidéo (pdfpc ou Adobe Reader ;
+%    Aperçu sur Mac ne lit pas les vidéos). La vidéo est dans videos/.
+% ----------------------------------------------------------------------
+\begin{frame}{Fusion en temps réel (KITTI)}
+  \centering
+  \movie[width=\textwidth, height=0.3016\textwidth, poster, showcontrols, loop]%
+    {\includegraphics[width=\textwidth]{videos/opencv_kitti_poster.png}}%
+    {videos/opencv_kitti.mp4}\par
+  \vspace{0.2cm}
+  \legende{Affichage OpenCV : masque YOLO + points LiDAR projetés \quad\textbullet\quad cliquer pour lancer la vidéo (10 s)}
+  \vspace{0.3cm}
+  {\small points LiDAR bien placés sur les objets $\Rightarrow$ \alert{calibration} et \alert{association} correctes\par}
+\end{frame}
+
+% ----------------------------------------------------------------------
 % À DIRE (~50 s)
 %  - Pour placer les points dans le repère monde, il faut la pose du
 %    robot à l'instant exact de chaque trame.

@@ -40,3 +40,11 @@ Fira Sans est utilisée si elle est installée, sinon Latin Modern.
   dans la numérotation.
 - Pour un projecteur 4:3, remplacer `aspectratio=169` par `aspectratio=43`.
   Les schémas TikZ sont prévus pour le 16:9 et devront alors être réduits.
+
+## Vidéo
+
+La slide « Fusion en temps réel (KITTI) » contient `videos/opencv_kitti.mp4`,
+un extrait de 10 s recadré sur la fenêtre OpenCV. Garde le dossier `videos/`
+à côté du PDF et clique sur l'image pour lancer la vidéo. Elle se lit avec
+pdfpc (`brew install pdfpc`), Adobe Reader ou Okular, mais pas avec Aperçu
+sur Mac.
